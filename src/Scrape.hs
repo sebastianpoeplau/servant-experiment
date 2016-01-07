@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scrape (getArticles) where
+module Scrape (getArticles, Article(..)) where
 
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -11,7 +11,7 @@ import Text.HTML.TagSoup
 
 data Article = Article { title :: Text
                        , url :: Text
-                       }
+                       } deriving (Show, Eq)
 
 
 -- | Download a web page.
@@ -24,7 +24,7 @@ getPage url = do
 -- | Extract a list of articles from Bunte.
 getArticles :: IO [Article]
 getArticles = do
-    page <- getPage "www.bunte.de"
+    page <- getPage "http://www.bunte.de/"
     page |> parseTags .> filter (~== ("<article>" :: String)) .> map toArticle .> catMaybes .> return
     where
         toArticle (TagOpen _ attrs) = Article <$> lookup "data-article-title" attrs

@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Scrape (getArticles, Article(..)) where
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Maybe
-import Flow
-import Network.HTTP (getRequest, getResponseBody, simpleHTTP)
-import Text.HTML.TagSoup
+import           Data.Maybe
+import           Data.Text         (Text)
+import qualified Data.Text         as T
+import           Flow
+import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
+import           Text.HTML.TagSoup
 
 
 data Article = Article { title :: Text
-                       , url :: Text
+                       , url   :: Text
                        } deriving (Show, Eq)
 
 
@@ -25,8 +25,8 @@ getPage url = do
 getArticles :: IO [Article]
 getArticles = do
     page <- getPage "http://www.bunte.de/"
-    page |> parseTags .> filter (~== ("<article>" :: String)) .> map toArticle .> catMaybes .> return
+    page |> parseTags .> mapMaybe toArticle .> return
     where
-        toArticle (TagOpen _ attrs) = Article <$> lookup "data-article-title" attrs
-                                              <*> lookup "data-internal-url" attrs
-        toArticle _                 = Nothing
+        toArticle (TagOpen "article" attrs) = Article <$> lookup "data-article-title" attrs
+                                                      <*> lookup "data-internal-url"  attrs
+        toArticle _                         = Nothing

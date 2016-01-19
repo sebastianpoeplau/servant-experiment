@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scrape (getArticles, Article(..)) where
+module Scrape (getArticles, getArticleContents, Article(..)) where
 
 import           Data.Maybe
 import           Data.Text         (Text)
@@ -8,9 +8,8 @@ import           Flow
 import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
 import           Text.HTML.TagSoup
 
-
-data Article = Article { title :: Text
-                       , url   :: Text
+data Article = Article { articleTitle :: Text
+                       , articleUrl   :: Text
                        } deriving (Show, Eq)
 
 
@@ -30,3 +29,14 @@ getArticles = do
         toArticle (TagOpen "article" attrs) = Article <$> lookup "data-article-title" attrs
                                                       <*> lookup "data-internal-url"  attrs
         toArticle _                         = Nothing
+
+getArticleContents :: Article -> IO Text
+getArticleContents (Article _ url) = do
+    page <- getPage url
+    -- print (parseTags page)
+    page |> parseTags
+         .> dropWhile (~/= ("<div class=\"article-text text-html-content container-fluid\">" :: String))
+         .> takeWhile (~/= ("<div id=likegate>" :: String))
+         .> innerText
+         .> T.lines .> filter (/= "") .> filter (not . T.isPrefixOf "Im Video:") .> T.unlines
+         .> return

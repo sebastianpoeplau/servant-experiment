@@ -7,6 +7,7 @@ import qualified Data.Text         as T
 import           Flow
 import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
 import           Text.HTML.TagSoup
+import           Data.Set          (fromList)
 
 data Article = Article { articleTitle :: Text
                        , articleUrl   :: Text
@@ -33,10 +34,10 @@ getArticles = do
 getArticleContents :: Article -> IO Text
 getArticleContents (Article _ url) = do
     page <- getPage url
-    -- print (parseTags page)
     page |> parseTags
          .> dropWhile (~/= ("<div class=\"article-text text-html-content container-fluid\">" :: String))
          .> takeWhile (~/= ("<div id=likegate>" :: String))
          .> innerText
-         .> T.lines .> filter (/= "") .> filter (not . T.isPrefixOf "Im Video:") .> T.unlines
+         .> T.lines .> filter (not . T.isPrefixOf "Im Video:") .> T.unlines
+         .> T.words .> T.unwords -- removes excess whitespace
          .> return

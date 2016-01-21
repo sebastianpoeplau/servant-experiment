@@ -1,16 +1,16 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scrape (getArticles, Article(..)) where
+module Scrape (getArticles, getArticleContents, Article(..)) where
 
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Maybe
-import Flow
-import Network.HTTP (getRequest, getResponseBody, simpleHTTP)
-import Text.HTML.TagSoup
+import           Data.Maybe
+import           Data.Text         (Text)
+import qualified Data.Text         as T
+import           Flow
+import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
+import           Text.HTML.TagSoup
+import           Data.Set          (fromList)
 
-
-data Article = Article { title :: Text
-                       , url :: Text
+data Article = Article { articleTitle :: Text
+                       , articleUrl   :: Text
                        } deriving (Show, Eq)
 
 
@@ -25,8 +25,19 @@ getPage url = do
 getArticles :: IO [Article]
 getArticles = do
     page <- getPage "http://www.bunte.de/"
-    page |> parseTags .> filter (~== ("<article>" :: String)) .> map toArticle .> catMaybes .> return
+    page |> parseTags .> mapMaybe toArticle .> return
     where
-        toArticle (TagOpen _ attrs) = Article <$> lookup "data-article-title" attrs
-                                              <*> lookup "data-internal-url" attrs
-        toArticle _                 = Nothing
+        toArticle (TagOpen "article" attrs) = Article <$> lookup "data-article-title" attrs
+                                                      <*> lookup "data-internal-url"  attrs
+        toArticle _                         = Nothing
+
+getArticleContents :: Article -> IO Text
+getArticleContents (Article _ url) = do
+    page <- getPage url
+    page |> parseTags
+         .> dropWhile (~/= ("<div class=\"article-text text-html-content container-fluid\">" :: String))
+         .> takeWhile (~/= ("<div id=likegate>" :: String))
+         .> innerText
+         .> T.lines .> filter (not . T.isPrefixOf "Im Video:") .> T.unlines
+         .> T.words .> T.unwords -- removes excess whitespace
+         .> return

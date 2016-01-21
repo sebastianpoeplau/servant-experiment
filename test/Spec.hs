@@ -6,12 +6,19 @@ import Test.Hspec
 
 
 main :: IO ()
-main = hspec $ do
-    describe "Scrape.getArticles" $ do
-        it "produces a non-empty list of articles" $ do
-            getArticles >>= (`shouldSatisfy` not . null)
+main = hspec $
+    describe "Scrape" $ do
+        describe "getArticles" $ do
+            it "produces a non-empty list of articles" $
+                getArticles >>= shouldNotBe []
 
-        it "creates article URLs below bunte.de" $ do
-            getArticles >>= mapM_ shouldBeAtBunte
-            where
-                shouldBeAtBunte (Article _ url) = url `shouldSatisfy` ("http://www.bunte.de/" `T.isPrefixOf`)
+            it "creates article URLs below bunte.de" $
+                let shouldBeAtBunte (Article _ url) = T.unpack url `shouldStartWith` "http://www.bunte.de/" in
+                getArticles >>= mapM_ shouldBeAtBunte
+
+        describe "getArticleContents" $
+            it "returns a non empty text" $ do
+                contents <- head <$> getArticles >>= getArticleContents
+                print contents
+                contents `shouldNotBe` ""
+

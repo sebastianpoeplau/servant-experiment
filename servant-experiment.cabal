@@ -19,6 +19,7 @@ library
                      , Scrape
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , containers
                      , flow
                      , HTTP
                      , servant-server

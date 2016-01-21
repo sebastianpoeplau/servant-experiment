@@ -7,7 +7,6 @@ import qualified Data.Text         as T
 import           Flow
 import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
 import           Text.HTML.TagSoup
-import           Data.Set          (fromList)
 
 data Article = Article { articleTitle :: Text
                        , articleUrl   :: Text

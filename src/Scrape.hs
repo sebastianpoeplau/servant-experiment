@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Scrape (getArticles, getArticleContents, Article(..)) where
+module Scrape (getArticles, getArticleContents) where
 
 import           Data.Maybe
 import           Data.Text         (Text)
@@ -8,9 +8,7 @@ import           Flow
 import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
 import           Text.HTML.TagSoup
 
-data Article = Article { articleTitle :: Text
-                       , articleUrl   :: Text
-                       } deriving (Show, Eq)
+import           Types
 
 
 -- | Download a web page.

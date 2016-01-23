@@ -1,17 +1,17 @@
-{-# LANGUAGE DataKinds       #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE TypeOperators #-}
 module API
     ( startApp
     ) where
 
-import Data.Aeson
-import Data.Aeson.TH
-import Network.Wai
-import Network.Wai.Handler.Warp
-import Servant
+import           Control.Monad.IO.Class
+import           Network.Wai
+import           Network.Wai.Handler.Warp
+import           Servant
 
-type Article = String -- temporary
+import           Scrape
+import           Types
+
 
 type API = "articles" :> Get '[JSON] [Article]
 
@@ -25,4 +25,4 @@ api :: Proxy API
 api = Proxy
 
 server :: Server API
-server = return []
+server = liftIO getArticles

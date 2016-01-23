@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     API
                      , Scrape
+                     , Types
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , containers
@@ -25,6 +26,7 @@ library
                      , servant-server
                      , tagsoup
                      , text
+                     , transformers
                      , wai
                      , warp
   default-language:    Haskell2010

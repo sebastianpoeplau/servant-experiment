@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.Text as T
-import Scrape
-import Test.Hspec
+import qualified Data.Text  as T
+import           Test.Hspec
+
+import           Scrape
+import           Types
 
 
 main :: IO ()
@@ -21,4 +23,3 @@ main = hspec $
                 contents <- head <$> getArticles >>= getArticleContents
                 print contents
                 contents `shouldNotBe` ""
-

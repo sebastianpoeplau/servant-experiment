@@ -1,13 +1,26 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE EmptyDataDecls             #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
+{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE QuasiQuotes                #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeFamilies               #-}
 module Types where
 
 import Data.Aeson
 import Data.Aeson.TH
 import Data.Text (Text)
+import Database.Persist
+import Database.Persist.Sqlite
+import Database.Persist.TH
 
 
-data Article = Article { articleTitle :: Text
-                       , articleUrl   :: Text
-                       } deriving (Show, Eq)
-
-$(deriveJSON defaultOptions ''Article)
+share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+Article json
+  title Text
+  url   Text
+  deriving Show Eq
+|]

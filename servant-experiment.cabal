@@ -23,6 +23,9 @@ library
                      , containers
                      , flow
                      , HTTP
+                     , persistent
+                     , persistent-sqlite
+                     , persistent-template
                      , servant-server
                      , tagsoup
                      , text

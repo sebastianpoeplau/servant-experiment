@@ -23,6 +23,7 @@ library
                      , containers
                      , flow
                      , HTTP
+                     , monad-logger
                      , persistent
                      , persistent-sqlite
                      , persistent-template

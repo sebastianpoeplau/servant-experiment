@@ -10,12 +10,10 @@
 {-# LANGUAGE TypeFamilies               #-}
 module Types where
 
-import Data.Aeson
-import Data.Aeson.TH
-import Data.Text (Text)
-import Database.Persist
-import Database.Persist.Sqlite
-import Database.Persist.TH
+import           Data.Text               (Text)
+import           Database.Persist
+import           Database.Persist.Sqlite
+import           Database.Persist.TH
 
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|

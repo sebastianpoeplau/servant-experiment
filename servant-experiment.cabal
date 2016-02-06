@@ -20,9 +20,11 @@ library
                      , Types
   build-depends:       base >= 4.7 && < 5
                      , aeson
+                     , classy-prelude
                      , containers
                      , flow
                      , HTTP
+                     , http-client
                      , monad-logger
                      , persistent
                      , persistent-sqlite

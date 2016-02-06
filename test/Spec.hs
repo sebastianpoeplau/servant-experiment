@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import qualified Data.Text  as T
+import qualified Data.Text.IO as T
 import           Test.Hspec
 
 import           Scrape
@@ -21,5 +22,5 @@ main = hspec $
         describe "getArticleContents" $
             it "returns a non empty text" $ do
                 contents <- head <$> getArticles >>= getArticleContents
-                print contents
+                T.putStrLn contents
                 contents `shouldNotBe` ""

@@ -1,11 +1,10 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Scrape (getArticles, getArticleContents) where
 
-import           Data.Maybe
-import           Data.Text         (Text)
-import qualified Data.Text         as T
+import           ClassyPrelude
 import           Flow
-import           Network.HTTP      (getRequest, getResponseBody, simpleHTTP)
+import           Network.HTTP.Client
 import           Text.HTML.TagSoup
 
 import           Types
@@ -14,8 +13,11 @@ import           Types
 -- | Download a web page.
 getPage :: Text -> IO Text
 getPage url = do
-    response <- url |> T.unpack .> getRequest .> simpleHTTP
-    T.pack <$> getResponseBody response
+    -- TODO: we shouldn't create a new manager each time
+    manager <- newManager defaultManagerSettings
+    request <- parseUrl (unpack url)
+    response <- httpLbs request manager
+    return . decodeUtf8 . toStrict . responseBody $ response
 
 
 -- | Extract a list of articles from Bunte.
@@ -35,6 +37,6 @@ getArticleContents (Article _ url) = do
          .> dropWhile (~/= ("<div class=\"article-text text-html-content container-fluid\">" :: String))
          .> takeWhile (~/= ("<div id=likegate>" :: String))
          .> innerText
-         .> T.lines .> filter (not . T.isPrefixOf "Im Video:") .> T.unlines
-         .> T.words .> T.unwords -- removes excess whitespace
+         .> lines .> filter (not . isPrefixOf "Im Video:") .> unlines
+         .> words .> unwords -- removes excess whitespace
          .> return

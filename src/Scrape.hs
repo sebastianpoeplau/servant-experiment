@@ -28,10 +28,11 @@ getArticles = do
     where
         toArticle (TagOpen "article" attrs) = Article <$> lookup "data-article-title" attrs
                                                       <*> lookup "data-internal-url"  attrs
+                                                      <*> pure False
         toArticle _                         = Nothing
 
 getArticleContents :: Article -> IO Text
-getArticleContents (Article _ url) = do
+getArticleContents (Article _ url _) = do
     page <- getPage url
     page |> parseTags
          .> dropWhile (~/= ("<div class=\"article-text text-html-content container-fluid\">" :: String))

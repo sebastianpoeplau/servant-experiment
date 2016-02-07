@@ -21,9 +21,8 @@ library
   build-depends:       base >= 4.7 && < 5
                      , aeson
                      , classy-prelude
-                     , containers
+                     , either
                      , flow
-                     , HTTP
                      , http-client
                      , monad-logger
                      , persistent
@@ -31,8 +30,6 @@ library
                      , persistent-template
                      , servant-server
                      , tagsoup
-                     , text
-                     , transformers
                      , wai
                      , warp
   default-language:    Haskell2010
@@ -50,9 +47,9 @@ test-suite servant-experiment-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
+                     , classy-prelude
                      , hspec
                      , servant-experiment
-                     , text
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 

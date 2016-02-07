@@ -1,7 +1,7 @@
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import qualified Data.Text  as T
-import qualified Data.Text.IO as T
+import           ClassyPrelude
 import           Test.Hspec
 
 import           Scrape
@@ -13,14 +13,15 @@ main = hspec $
     describe "Scrape" $ do
         describe "getArticles" $ do
             it "produces a non-empty list of articles" $
-                getArticles >>= shouldNotBe []
+                getArticles `shouldNotReturn` []
 
             it "creates article URLs below bunte.de" $
-                let shouldBeAtBunte (Article _ url) = T.unpack url `shouldStartWith` "http://www.bunte.de/" in
+                let shouldBeAtBunte (Article _ url _) = unpack url `shouldStartWith` "http://www.bunte.de/" in
                 getArticles >>= mapM_ shouldBeAtBunte
 
         describe "getArticleContents" $
             it "returns a non empty text" $ do
-                contents <- head <$> getArticles >>= getArticleContents
-                T.putStrLn contents
-                contents `shouldNotBe` ""
+                articles <- getArticles
+                case articles of
+                    [] -> expectationFailure "No articles available"
+                    (a:_) -> getArticleContents a `shouldNotReturn` ""

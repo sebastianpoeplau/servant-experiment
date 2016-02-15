@@ -31,6 +31,8 @@ getArticles = do
                                                       <*> pure False
         toArticle _                         = Nothing
 
+
+-- | Extract the contents of an article from Bunte.
 getArticleContents :: Article -> IO Text
 getArticleContents (Article _ url _) = do
     page <- getPage url
